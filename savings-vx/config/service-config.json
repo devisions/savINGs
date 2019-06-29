@@ -1,0 +1,12 @@
+{
+
+  "webApi": {
+    "httpPort": 8888,
+    "verticles": 1
+  },
+
+  "eventbus": {
+    "savingsAccountsRepoAddress": "savingsAccountsRepoAddress"
+  }
+
+}
