@@ -11,6 +11,7 @@ import org.devisions.labs.savings.vx.models.SavingsAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -29,6 +30,7 @@ public class SavingsAccountsRepoVerticle extends AbstractVerticle implements Bas
     @Override
     public void start(Future<Void> startFuture) {
 
+        store = new HashMap<>();
         setupEventBusCommunication().setHandler(startFuture.completer());
 
     }
@@ -79,7 +81,7 @@ public class SavingsAccountsRepoVerticle extends AbstractVerticle implements Bas
         if (account != null) {
             message.reply(new JsonObject().put(IO.GET_SAVINGS_ACCOUNT_BY_OWNER_RS, Json.encode(account)));
         } else {
-            message.fail(IO.GET_SAVINGS_ACCOUNT_BY_OWNER_ERROR_RS, "Exchange rate is unknown.");
+            message.fail(IO.GET_SAVINGS_ACCOUNT_BY_OWNER_ERROR_RS, "Owner cannot be found.");
         }
 
     }

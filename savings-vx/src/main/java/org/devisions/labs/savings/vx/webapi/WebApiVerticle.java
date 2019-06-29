@@ -96,10 +96,12 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
     private void getSavingsAccountByOwnerHandler(RoutingContext context) {
 
         HttpServerRequest request = context.request();
+        String ownerId = request.getParam("ownerId");
+        logger.debug("getSavingsAccountByOwnerHandler > sending ownerId {}", ownerId);
         eventBus.send(savingsAccountsRepoAddress, new JsonObject(),
             new DeliveryOptions()
                 .addHeader(SavingsAccountsRepoVerticle.IO.RQ_NAME, SavingsAccountsRepoVerticle.IO.GET_SAVINGS_ACCOUNT_BY_OWNER_RQ)
-                .addHeader(SavingsAccountsRepoVerticle.IO.OWNER_ID, request.getParam("owner"))
+                .addHeader(SavingsAccountsRepoVerticle.IO.OWNER_ID, ownerId)
                 .setSendTimeout(3_000), // waiting up to 3 seconds for a reply
             event -> {
                 HttpServerResponse serverResponse = context.response();
@@ -108,9 +110,12 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
                     SavingsAccount account = Json.decodeValue(
                         accountJson.getString(SavingsAccountsRepoVerticle.IO.GET_SAVINGS_ACCOUNT_BY_OWNER_RS),
                         SavingsAccount.class);
+                    logger.debug("getSavingsAccountByOwnerHandler > returning {}", account);
                     respond(serverResponse, Json.encodePrettily(account));
                 } else {
-                    respondError(context.response(), event.cause().getMessage(),
+                    String errorMsg = event.cause().getMessage();
+                    logger.error("getSavingsAccountByOwnerHandler > {}", errorMsg);
+                    respondError(context.response(), errorMsg,
                         HttpResponseStatus.INTERNAL_SERVER_ERROR.code());
                 }
             });
