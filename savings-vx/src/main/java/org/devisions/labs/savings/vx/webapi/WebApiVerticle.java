@@ -1,6 +1,5 @@
 package org.devisions.labs.savings.vx.webapi;
 
-import io.netty.handler.codec.http.HttpStatusClass;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpServerRequest;
@@ -8,11 +7,15 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 import org.devisions.labs.savings.vx.config.MainConfig;
+import org.devisions.labs.savings.vx.models.SavingsAccount;
 import org.devisions.labs.savings.vx.services.SavingsAccountsService;
 import org.devisions.labs.savings.vx.services.SavingsAccountsServiceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.LocalTime;
 
 
 public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
@@ -62,8 +65,13 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
 
         Router router = Router.router(vertx);
 
-        // ------- API ROUTES -------
-        router.get("/savings/:ownerId").handler(this::getSavingsAccountByOwnerHandler);
+        // __________ API ROUTES __________
+
+        router.get("/savings/byowner/:ownerId").handler(this::getSavingsAccountByOwnerHandler);
+        router.post().handler(BodyHandler.create());
+        router.post("/savings/byowner/:ownerId").handler(this::storeSavingsAccountByOwnerHandler);
+
+        // __________ HTTP Server __________
 
         int httpPort = config.getJsonObject("webApi").getInteger("httpPort");
         vertx.createHttpServer()
@@ -87,7 +95,7 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
 
         HttpServerRequest request = context.request();
         String ownerId = request.getParam("ownerId");
-        logger.debug("getSavingsAccountByOwnerHandler > Starting processing using ownerId {} ...", ownerId);
+        logger.debug("getSavingsAccountByOwnerHandler > Starting with ownerId '{}'.", ownerId);
         savingsAccountsService.getSavingsAccountByOwner(ownerId, reply -> {
             HttpServerResponse response = context.response();
             response.putHeader("content-type", "application/json");
@@ -102,6 +110,24 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
 
     }
 
+    /** The handler of "storeSavingsAccountByOwner" requests. */
+    private void storeSavingsAccountByOwnerHandler(RoutingContext context) {
 
+        HttpServerRequest request = context.request();
+        String ownerId = request.getParam("ownerId");
+        JsonObject accountJson = context.getBodyAsJson();
+        logger.debug("storeSavingsAccountByOwnerHandler > Starting with ownerId '{}' and accountJson '{}'.", ownerId, accountJson);
+        savingsAccountsService.storeSavingsAccountByOwner(ownerId, SavingsAccount.fromJson(accountJson), reply -> {
+            HttpServerResponse response = context.response();
+            if (reply.succeeded()) {
+                response.setStatusCode(201);
+                response.end(reply.result().encodePrettily());
+            } else {
+                response.setStatusCode(401);
+                response.end(reply.cause().getMessage());
+            }
+        });
+
+    }
 
 }

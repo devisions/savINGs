@@ -4,14 +4,18 @@ package org.devisions.labs.savings.vx.models;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
+import java.util.UUID;
+
 
 /**
- * Savings account domain model.
+ * Savings Account model.
  *
  * @author devisions
  */
 @DataObject
 public class SavingsAccount {
+
+    private String id;
 
     private String name;
 
@@ -20,44 +24,76 @@ public class SavingsAccount {
     private String ownerId;
 
     public SavingsAccount(String name, String description, String ownerId) {
+        this.id = UUID.randomUUID().toString();
         this.name = name;
         this.description = description;
         this.ownerId = ownerId;
     }
 
     public SavingsAccount(JsonObject json) {
+        this.id = UUID.randomUUID().toString();
         this.name = json.getString("name");
         this.description = json.getString("description");
         this.ownerId = json.getString("ownerId");
+    }
+
+    public SavingsAccount(JsonObject json, String id) {
+        this.name = json.getString("name");
+        this.description = json.getString("description");
+        this.ownerId = json.getString("ownerId");
+        this.id = UUID.randomUUID().toString();
+    }
+
+    // __________ getters and (fluent) setters __________
+
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public SavingsAccount setName(String name) {
         this.name = name;
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public SavingsAccount setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     public String getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(String ownerId) {
+    public SavingsAccount setOwnerId(String ownerId) {
         this.ownerId = ownerId;
+        return this;
     }
 
-    /** Utility method used by verticles as they talk (respond) JSON language. */
+    // __________ utilities __________
+
+    /**
+     * Convert this instance to JsonObject.<br/>
+     * This utility method is used by verticles as they talk (receive & respond) JSON.
+     */
     public JsonObject toJson() {
-        return new JsonObject().put("name", name).put("description", description).put("ownerId", ownerId);
+        return new JsonObject().put("id", id).put("name", name).put("description", description).put("ownerId", ownerId);
+    }
+
+    /**
+     * Create an SavingsAccount instance from the provided JsonObject.<br/>
+     * This utility method is used by verticles as they talk (receive & respond) JSON.
+     */
+    public static SavingsAccount fromJson(JsonObject json) {
+        return new SavingsAccount(json);
     }
 
 }
