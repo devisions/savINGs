@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author devisions
  */
-public class SavingsAccountsServiceVerticle extends AbstractVerticle implements BaseSvcVerticle {
+public class SavingsAccountsServiceVerticle extends AbstractVerticle {
 
     private static final Logger logger = LoggerFactory.getLogger(SavingsAccountsServiceVerticle.class);
 

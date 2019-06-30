@@ -14,6 +14,11 @@ import java.time.Duration;
 import java.time.Instant;
 
 
+/**
+ * The startup verticle.
+ *
+ * @author devisions
+ */
 public class StartVerticle extends AbstractVerticle {
 
     private static final String SERVICE_CONFIG_FILE = "config/service-config.json";

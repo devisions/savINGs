@@ -15,9 +15,12 @@ import org.devisions.labs.savings.vx.services.SavingsAccountsServiceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalTime;
 
-
+/**
+ * The Web API verticle.
+ *
+ * @author devisions
+ */
 public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
 
     private SavingsAccountsService savingsAccountsService;
@@ -101,10 +104,9 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
             response.putHeader("content-type", "application/json");
             JsonObject accountJson = reply.result();
             if (accountJson != null) {
-                response.end(accountJson.encodePrettily());
+                respondOKWithJsonContent(response, accountJson.encodePrettily());
             } else {
-                response.setStatusCode(404);
-                response.end();
+                respondNotFoundWithoutContent(response);
             }
         });
 
@@ -120,11 +122,9 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
         savingsAccountsService.storeSavingsAccountByOwner(ownerId, SavingsAccount.fromJson(accountJson), reply -> {
             HttpServerResponse response = context.response();
             if (reply.succeeded()) {
-                response.setStatusCode(201);
-                response.end(reply.result().encodePrettily());
+                respondCreatedWithJsonContent(response, reply.result().encodePrettily());
             } else {
-                response.setStatusCode(401);
-                response.end(reply.cause().getMessage());
+                respondForbiddenWithJsonContent(response, reply.cause().getMessage());
             }
         });
 
