@@ -31,6 +31,15 @@ public interface SavingsAccountsService {
         return new SavingsAccountsServiceVertxEBProxy(vertx, address);
     }
 
+    /** Config part of the class. */
+    @GenIgnore
+    class Config {
+
+        /** event bus address of this verticle */
+        public static final String EB_ADDRESS = "savingsAccountsServiceAddress";
+
+    }
+
     // __________ features methods __________
 
     void commCheck(Handler<AsyncResult<JsonObject>> resultHandler);

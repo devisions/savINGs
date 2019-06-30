@@ -5,12 +5,14 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import org.devisions.labs.savings.vx.config.MainConfig;
 import org.devisions.labs.savings.vx.models.SavingsAccount;
 import org.devisions.labs.savings.vx.repos.SavingsAccountsRepo;
 import org.devisions.labs.savings.vx.webapi.WebApiError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Clock;
 import java.time.LocalTime;
 
 
@@ -23,10 +25,13 @@ public class SavingsAccountsServiceImpl implements SavingsAccountsService {
 
     private SavingsAccountsRepo repo;
 
+    private Clock clock;
+
     private static final Logger logger = LoggerFactory.getLogger(SavingsAccountsServiceImpl.class);
 
-    public SavingsAccountsServiceImpl(Handler<AsyncResult<SavingsAccountsService>> readyHandler) {
+    SavingsAccountsServiceImpl(Handler<AsyncResult<SavingsAccountsService>> readyHandler) {
         this.repo = new SavingsAccountsRepo();
+        this.clock = MainConfig.getInstance().getClock();
         readyHandler.handle(Future.succeededFuture(this));
     }
 
@@ -53,7 +58,7 @@ public class SavingsAccountsServiceImpl implements SavingsAccountsService {
         logger.debug("storeSavingsAccountByOwner > Starting with ownerId '{}' and account '{}'", ownerId, account.toJson().encode());
 
         // Check BR-1: "The account can only be opened between 8 AM and 5 PM".
-        LocalTime currentTime = LocalTime.now();
+        LocalTime currentTime = LocalTime.now(clock);
         if (!isWorkingTime(currentTime)) {
             resultHandler.handle(Future.failedFuture(
                 new WebApiError(1, String.format(
@@ -62,15 +67,19 @@ public class SavingsAccountsServiceImpl implements SavingsAccountsService {
         }
 
         // Check BR-2: "the user can have only one savings account".
-        if (hasUserAccount(ownerId)) {
+        else if (hasUserAccount(ownerId)) {
             resultHandler.handle(Future.failedFuture(
                 new WebApiError(2, String.format("Sorry! The user (id:'%s') already has a savings account.", ownerId)
                 ).toJsonString()));
         }
 
-        account.setOwnerId(ownerId);
-        repo.saveAccountToOwner(ownerId, account);
-        resultHandler.handle(Future.succeededFuture(account.toJson()));
+        // All good, let's save the new account.
+        else {
+            account.generateId();
+            account.setOwnerId(ownerId);
+            repo.saveAccountToOwner(ownerId, account);
+            resultHandler.handle(Future.succeededFuture(account.toJson()));
+        }
 
     }
 

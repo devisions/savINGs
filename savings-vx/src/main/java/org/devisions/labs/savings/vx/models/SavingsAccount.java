@@ -31,7 +31,6 @@ public class SavingsAccount {
     }
 
     public SavingsAccount(JsonObject json) {
-        this.id = UUID.randomUUID().toString();
         this.name = json.getString("name");
         this.description = json.getString("description");
         this.ownerId = json.getString("ownerId");
@@ -42,6 +41,15 @@ public class SavingsAccount {
         this.description = json.getString("description");
         this.ownerId = json.getString("ownerId");
         this.id = UUID.randomUUID().toString();
+    }
+
+    /**
+     * This method is used before saving it to the repository.<br/>
+     * There is no need to generate and assign an id if the all BRs are not satisfied.
+     */
+    public SavingsAccount generateId() {
+        this.id = UUID.randomUUID().toString();
+        return this;
     }
 
     // __________ getters and (fluent) setters __________

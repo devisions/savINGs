@@ -11,7 +11,6 @@ import io.vertx.ext.web.handler.BodyHandler;
 import org.devisions.labs.savings.vx.config.MainConfig;
 import org.devisions.labs.savings.vx.models.SavingsAccount;
 import org.devisions.labs.savings.vx.services.SavingsAccountsService;
-import org.devisions.labs.savings.vx.services.SavingsAccountsServiceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,10 +29,10 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
     private static final Logger logger = LoggerFactory.getLogger(WebApiVerticle.class);
 
     @Override
-    public void start(Future<Void> startFuture) throws Exception {
+    public void start(Future<Void> startFuture) {
 
         String savingsAccountsServiceAddress = config.getJsonObject("eventbus")
-            .getString(SavingsAccountsServiceConfig.EB_ADDRESS);
+            .getString(SavingsAccountsService.Config.EB_ADDRESS);
         this.savingsAccountsService = SavingsAccountsService.createProxy(vertx, savingsAccountsServiceAddress);
 
         Future<Void> startupSteps = startupCommCheck()

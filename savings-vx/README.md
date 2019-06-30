@@ -1,6 +1,6 @@
 ## Savings - A Vert.x based example
 
-
+An example of RESTful API implemented using Eclipse Vert.x framework.<br/>
 
 ### Run
 
@@ -46,9 +46,15 @@ The BRs are as follows:
 1. The account can only be opened between 8 AM and 5 PM.
 2. The user can have only one savings account.
 
-_________________________
 
+### Unit Tests
 
 To launch the tests use `./mvnw clean test`
-To package the application use `./mvnw clean package`
 
+
+### Build
+
+To package the application use `./mvnw clean package`. It will run the tests again and generate `target/savings-vx-1.0.0-fat.jar` file.
+
+Then you can simply run it in the same project root using `java -jar target/savings-vx-1.0.0-fat.jar`. Note that it is looking for `config/service-config.json` file which is a relative path.
+Therefore, if you deploy it somewhere, make sure you have this `config` directory and `service-config.json` file into it in the same target location as the JAR.

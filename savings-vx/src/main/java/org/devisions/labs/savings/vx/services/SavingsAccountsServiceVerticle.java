@@ -24,7 +24,7 @@ public class SavingsAccountsServiceVerticle extends AbstractVerticle {
             if (ready.succeeded()) {
                 SavingsAccountsService sas = ready.result();
                 new ServiceBinder(vertx)
-                    .setAddress(SavingsAccountsServiceConfig.EB_ADDRESS)
+                    .setAddress(SavingsAccountsService.Config.EB_ADDRESS)
                     .register(SavingsAccountsService.class, sas);
                 logger.debug("A SavingsAccountsService implementation is registered to event bus.");
                 startFuture.complete();

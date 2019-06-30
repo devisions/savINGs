@@ -4,6 +4,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import org.devisions.labs.savings.vx.commons.DateTimeUtils;
+import org.devisions.labs.savings.vx.commons.testing.FixedClock;
 import org.devisions.labs.savings.vx.config.MainConfig;
 import org.devisions.labs.savings.vx.services.SavingsAccountsServiceVerticle;
 import org.devisions.labs.savings.vx.webapi.WebApiVerticle;
@@ -32,8 +33,6 @@ public class StartVerticle extends AbstractVerticle {
         logger.info("\n\n------------------------------------\n" +
             "   savings-vx service is starting\n" +
             "------------------------------------\n");
-
-//    initObjectMappers();
 
         Future<Void> startupSteps = MainConfig.getInstance().init(SERVICE_CONFIG_FILE)
             .compose(v -> deploySavingsAccountsServiceVerticle())
