@@ -1,30 +1,23 @@
 package org.devisions.labs.savings.vx.webapi;
 
-import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpStatusClass;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.eventbus.DeliveryOptions;
-import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import org.devisions.labs.savings.vx.config.MainConfig;
-import org.devisions.labs.savings.vx.models.SavingsAccount;
-import org.devisions.labs.savings.vx.repos.SavingsAccountsRepoVerticle;
+import org.devisions.labs.savings.vx.services.SavingsAccountsService;
+import org.devisions.labs.savings.vx.services.SavingsAccountsServiceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
 
-    private String savingsAccountsRepoAddress;
-
-    private EventBus eventBus;
-
-    private static int httpPort;
+    private SavingsAccountsService savingsAccountsService;
 
     private static final JsonObject config = MainConfig.getInstance().getConfig();
 
@@ -33,39 +26,36 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
     @Override
     public void start(Future<Void> startFuture) throws Exception {
 
-        this.savingsAccountsRepoAddress = config.getJsonObject("eventbus")
-            .getString(SavingsAccountsRepoVerticle.CONFIG.EVENTBUS_ADDRESS);
-        this.eventBus = vertx.eventBus();
+        String savingsAccountsServiceAddress = config.getJsonObject("eventbus")
+            .getString(SavingsAccountsServiceConfig.EB_ADDRESS);
+        this.savingsAccountsService = SavingsAccountsService.createProxy(vertx, savingsAccountsServiceAddress);
 
-        Future<Void> startupSteps = startupSavingsAccountsRepoCheck()
+        Future<Void> startupSteps = startupCommCheck()
             .compose(v -> apiSetup());
 
         startupSteps.setHandler(startFuture.completer());
 
     }
 
-    private Future<Void> startupSavingsAccountsRepoCheck() {
+    /** Communication checks, performed at startup (verticle deployment) time. */
+    private Future<Void> startupCommCheck() {
 
         Future<Void> responseFuture = Future.future();
-
-        eventBus.send(savingsAccountsRepoAddress, new JsonObject(),
-            new DeliveryOptions()
-                .addHeader(SavingsAccountsRepoVerticle.IO.RQ_NAME, SavingsAccountsRepoVerticle.IO.COMM_CHECK_RQ)
-                .setSendTimeout(3_000), // waiting for 3 seconds to get a reply
-            event -> {
-                if (event.succeeded()) {
-                    logger.info("Startup comm check: {}", event.result().body());
-                    responseFuture.complete();
-                } else {
-                    responseFuture.fail(event.cause().getMessage());
-                }
-            });
+        savingsAccountsService.commCheck(event -> {
+            if (event.succeeded()) {
+                logger.debug("Startup comm check ok.");
+                responseFuture.complete();
+            } else {
+                logger.debug("Startup comm check failed! Error: {}", event.cause().getMessage());
+                responseFuture.fail(event.cause());
+            }
+        });
 
         return responseFuture;
 
     }
 
-    /** WebApi setup (routes & http server). */
+    /** Web API setup (routes & http server). */
     private Future<Void> apiSetup() {
 
         Future<Void> responseFuture = Future.future();
@@ -75,7 +65,7 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
         // ------- API ROUTES -------
         router.get("/savings/:ownerId").handler(this::getSavingsAccountByOwnerHandler);
 
-        httpPort = config.getJsonObject("webApi").getInteger("httpPort");
+        int httpPort = config.getJsonObject("webApi").getInteger("httpPort");
         vertx.createHttpServer()
             .requestHandler(router::accept)
             .listen(httpPort, ar -> {
@@ -97,29 +87,21 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
 
         HttpServerRequest request = context.request();
         String ownerId = request.getParam("ownerId");
-        logger.debug("getSavingsAccountByOwnerHandler > sending ownerId {}", ownerId);
-        eventBus.send(savingsAccountsRepoAddress, new JsonObject(),
-            new DeliveryOptions()
-                .addHeader(SavingsAccountsRepoVerticle.IO.RQ_NAME, SavingsAccountsRepoVerticle.IO.GET_SAVINGS_ACCOUNT_BY_OWNER_RQ)
-                .addHeader(SavingsAccountsRepoVerticle.IO.OWNER_ID, ownerId)
-                .setSendTimeout(3_000), // waiting up to 3 seconds for a reply
-            event -> {
-                HttpServerResponse serverResponse = context.response();
-                if (event.succeeded()) {
-                    JsonObject accountJson = (JsonObject) event.result().body();
-                    SavingsAccount account = Json.decodeValue(
-                        accountJson.getString(SavingsAccountsRepoVerticle.IO.GET_SAVINGS_ACCOUNT_BY_OWNER_RS),
-                        SavingsAccount.class);
-                    logger.debug("getSavingsAccountByOwnerHandler > returning {}", account);
-                    respond(serverResponse, Json.encodePrettily(account));
-                } else {
-                    String errorMsg = event.cause().getMessage();
-                    logger.error("getSavingsAccountByOwnerHandler > {}", errorMsg);
-                    respondError(context.response(), errorMsg,
-                        HttpResponseStatus.INTERNAL_SERVER_ERROR.code());
-                }
-            });
+        logger.debug("getSavingsAccountByOwnerHandler > Starting processing using ownerId {} ...", ownerId);
+        savingsAccountsService.getSavingsAccountByOwner(ownerId, reply -> {
+            HttpServerResponse response = context.response();
+            response.putHeader("content-type", "application/json");
+            JsonObject accountJson = reply.result();
+            if (accountJson != null) {
+                response.end(accountJson.encodePrettily());
+            } else {
+                response.setStatusCode(404);
+                response.end();
+            }
+        });
 
     }
+
+
 
 }

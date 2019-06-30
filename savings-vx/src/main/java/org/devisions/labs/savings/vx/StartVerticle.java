@@ -5,7 +5,7 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import org.devisions.labs.savings.vx.commons.DateTimeUtils;
 import org.devisions.labs.savings.vx.config.MainConfig;
-import org.devisions.labs.savings.vx.repos.SavingsAccountsRepoVerticle;
+import org.devisions.labs.savings.vx.services.SavingsAccountsServiceVerticle;
 import org.devisions.labs.savings.vx.webapi.WebApiVerticle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class StartVerticle extends AbstractVerticle {
 //    initObjectMappers();
 
         Future<Void> startupSteps = MainConfig.getInstance().init(SERVICE_CONFIG_FILE)
-            .compose(v -> deploySavingsAccountsRepoVerticle())
+            .compose(v -> deploySavingsAccountsServiceVerticle())
             .compose(v -> deployWebApiVerticle());
 
         startupSteps.setHandler(v -> {
@@ -52,23 +52,24 @@ public class StartVerticle extends AbstractVerticle {
         logger.info("Shutdown complete.");
     }
 
-    /** Deploy the {@link SavingsAccountsRepoVerticle}. */
+    /** Deploy the {@link SavingsAccountsServiceVerticle}. */
     @SuppressWarnings("Duplicates")
-    private Future<Void> deploySavingsAccountsRepoVerticle() {
+    private Future<Void> deploySavingsAccountsServiceVerticle() {
 
         Future<Void> resultFuture = Future.future();
 
         Future<String> deploymentFuture = Future.future();
         deploymentFuture.setHandler(ar -> {
             if (ar.succeeded()) {
+                logger.debug("SavingsAccountsServiceVerticle deploy done.");
                 resultFuture.complete();
             } else {
-                logger.debug("SavingsAccountsRepoVerticle deployment error: {}", ar.cause().getMessage());
+                logger.debug("SavingsAccountsServiceVerticle deploy error: {}", ar.cause().getMessage());
                 resultFuture.fail(ar.cause());
             }
         });
 
-        vertx.deployVerticle(SavingsAccountsRepoVerticle.class,
+        vertx.deployVerticle(SavingsAccountsServiceVerticle.class,
             new DeploymentOptions(),
             deploymentFuture.completer()
         );
@@ -85,9 +86,10 @@ public class StartVerticle extends AbstractVerticle {
         Future<String> deploymentFuture = Future.future();
         deploymentFuture.setHandler(ar -> {
             if (ar.succeeded()) {
+                logger.debug("WebApiVerticle deploy done.");
                 resultFuture.complete();
             } else {
-                logger.debug("WebApiVerticle deployment error: {}", ar.cause().getMessage());
+                logger.debug("WebApiVerticle deploy error: {}", ar.cause().getMessage());
                 resultFuture.fail(ar.cause());
             }
         });
@@ -95,7 +97,8 @@ public class StartVerticle extends AbstractVerticle {
         vertx.deployVerticle(
             WebApiVerticle.class,
             new DeploymentOptions().setInstances(
-                MainConfig.getInstance().getConfig().getJsonObject("webApi").getInteger("verticles")),
+                MainConfig.getInstance().getConfig()
+                    .getJsonObject("webApi").getInteger("verticles")),
             deploymentFuture.completer()
         );
 

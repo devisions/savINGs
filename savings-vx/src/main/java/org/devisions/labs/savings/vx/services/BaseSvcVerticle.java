@@ -1,4 +1,4 @@
-package org.devisions.labs.savings.vx.repos;
+package org.devisions.labs.savings.vx.services;
 
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
@@ -6,11 +6,12 @@ import org.devisions.labs.savings.vx.commons.Errors;
 
 
 /**
- * This base interface provides common methods used by all repos.
+ * This base interface provides common methods used by
+ * the services that are implemented through a verticle.
  *
  * @author devisions
  */
-public interface BaseRepo {
+public interface BaseSvcVerticle {
 
   /** This is a standard communication check handler. */
   default void commCheck(Message<JsonObject> message) {

@@ -6,7 +6,7 @@
   },
 
   "eventbus": {
-    "savingsAccountsRepoAddress": "savingsAccountsRepoAddress"
+    "savingsAccountsServiceAddress": "savingsAccountsServiceAddress"
   }
 
 }
