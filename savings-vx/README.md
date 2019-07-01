@@ -9,7 +9,7 @@ It showcases the usage of the following subset of Vert.x features:
 * WebClient
 * JUnit5 integration
 
-It also serve static files using `StaticHandler`, mounted for "/" requests and serving the files from `webroot` directory that exists in the root project structure.
+It also serve static files using `StaticHandler`, mounted for "/" requests and serving the files from `webroot` directory that exists in the root project structure. The alternative is to have this directory in `src/main/resources`, thus it gets bundled into the generated executable JAR, but during development any UI related change triggers an unnecessary redeploy of the verticles, so it not efficient this way.
 <br/>
 
 The business requirements (BRs) are as follows:
@@ -26,9 +26,9 @@ To run the application use either:
 
 ### Usage
 
-There is a basic UI available in /: `http://localhost:8888`.
+There is a basic UI available at `http://localhost:8888`.
 
-The following features exposed as API operations that can be called directly:
+The following capabilities are exposed as API operations:
 
 - get a savings account by owner id
     - example for owner id of 1 (that has a savings account):
@@ -40,6 +40,7 @@ The following features exposed as API operations that can be called directly:
         "description" : "Holiday savings bucket",
         "ownerId" : "1"
       }
+      $
       ```
     - if found, it returns the account as Json and HTTP RC 200
     - otherwise, it returns HTTP RC 404 with an empty body
@@ -54,6 +55,7 @@ The following features exposed as API operations that can be called directly:
         "description" : "Holiday savings bucket",
         "ownerId" : "1"
       }
+      $
       ```
 
     - if BRs are satisfied, it returns the newly created account as Json and HTTP RC 201
