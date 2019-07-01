@@ -1,6 +1,17 @@
 ## Savings - A Vert.x based example
 
-An example of RESTful API implemented using Eclipse Vert.x framework.<br/>
+An example of simple RESTful API implemented using Eclipse Vert.x framework, thus it's completely reactive. Yay! :-)
+
+It showcases the usage of the following subset of Vert.x features:
+* Web
+* Config
+* ServiceProxy
+* WebClient
+* JUnit5 integration
+
+It also serve static files using `StaticHandler`, mounted for "/" requests and serving the files from `webroot` directory that exists in the root project structure.
+<br/>
+
 The business requirements (BRs) are as follows:
 1. The account can only be opened between 8 AM and 5 PM.
 2. The user can have only one savings account.
@@ -9,7 +20,7 @@ The business requirements (BRs) are as follows:
 ### Run
 
 To run the application use either:
-- `run.sh` to start it in the standard way (compile and run)
+- `run.sh` to start it in the 'standard' mode (compile and run)
 - `run-dev.sh` to start it in 'redeploy' mode
 
 
@@ -58,5 +69,10 @@ To launch the tests use `./mvnw clean test`
 
 To package the application use `./mvnw clean package`. It will run the tests again and generate `target/savings-vx-1.0.0-fat.jar` file.
 
-Then you can simply run it in the same project root using `java -jar target/savings-vx-1.0.0-fat.jar`. Note that it is looking for `config/service-config.json` file which is a relative path.
-Therefore, if you deploy it somewhere, make sure you have this `config` directory and `service-config.json` file into it in the same target location as the JAR.
+Then you can simply run it in the same project root using `java -jar target/savings-vx-1.0.0-fat.jar`.
+
+Note that:
+- it is looking for `config/service-config.json` file which is a relative path
+- it serves the static files from `webroot` directory
+
+Therefore, if you deploy it somewhere, make sure you have the JAR plus `config` and `webroot` directories in the same target location.

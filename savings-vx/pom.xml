@@ -72,7 +72,6 @@
             <classifier>processor</classifier>
         </dependency>
 
-
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web-client</artifactId>
