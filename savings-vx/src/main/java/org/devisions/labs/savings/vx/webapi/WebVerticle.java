@@ -8,6 +8,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.StaticHandler;
 import org.devisions.labs.savings.vx.config.MainConfig;
 import org.devisions.labs.savings.vx.models.SavingsAccount;
 import org.devisions.labs.savings.vx.services.SavingsAccountsService;
@@ -16,17 +17,17 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * The Web API verticle.
+ * The Web (API+Pages) verticle.
  *
  * @author devisions
  */
-public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
+public class WebVerticle extends AbstractVerticle implements BaseWebApi {
 
     private SavingsAccountsService savingsAccountsService;
 
     private static final JsonObject config = MainConfig.getInstance().getConfig();
 
-    private static final Logger logger = LoggerFactory.getLogger(WebApiVerticle.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebVerticle.class);
 
     @Override
     public void start(Future<Void> startFuture) {
@@ -36,7 +37,7 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
         this.savingsAccountsService = SavingsAccountsService.createProxy(vertx, savingsAccountsServiceAddress);
 
         Future<Void> startupSteps = startupCommCheck()
-            .compose(v -> apiSetup());
+            .compose(v -> httpSetup());
 
         startupSteps.setHandler(startFuture.completer());
 
@@ -60,8 +61,8 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
 
     }
 
-    /** Web API setup (routes & http server). */
-    private Future<Void> apiSetup() {
+    /** HTTP (Web API+Pages) setup (routes & http server). */
+    private Future<Void> httpSetup() {
 
         Future<Void> responseFuture = Future.future();
 
@@ -73,6 +74,10 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
         router.post().handler(BodyHandler.create());
         router.post("/savings/byowner/:ownerId").handler(this::storeSavingsAccountByOwnerHandler);
 
+        // __________ PAGES ROUTES __________
+
+        router.route().handler(StaticHandler.create().setCachingEnabled(false));
+
         // __________ HTTP Server __________
 
         int httpPort = config.getJsonObject("webApi").getInteger("httpPort");
@@ -80,10 +85,10 @@ public class WebApiVerticle extends AbstractVerticle implements BaseWebApi {
             .requestHandler(router::accept)
             .listen(httpPort, ar -> {
                 if (ar.succeeded()) {
-                    logger.info("WebApi server is running on port {}.", httpPort);
+                    logger.info("HTTP server is running on port {}.", httpPort);
                     responseFuture.complete();
                 } else {
-                    logger.error("Failed to start WebApi server. Reason: {}", ar.cause().getMessage());
+                    logger.error("Failed to start HTTP server. Reason: {}", ar.cause().getMessage());
                     responseFuture.fail(ar.cause());
                 }
             });

@@ -4,10 +4,9 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import org.devisions.labs.savings.vx.commons.DateTimeUtils;
-import org.devisions.labs.savings.vx.commons.testing.FixedClock;
 import org.devisions.labs.savings.vx.config.MainConfig;
 import org.devisions.labs.savings.vx.services.SavingsAccountsServiceVerticle;
-import org.devisions.labs.savings.vx.webapi.WebApiVerticle;
+import org.devisions.labs.savings.vx.webapi.WebVerticle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +80,7 @@ public class StartVerticle extends AbstractVerticle {
         return resultFuture;
     }
 
-    /** Deploy the {@link WebApiVerticle}. */
+    /** Deploy the {@link WebVerticle}. */
     @SuppressWarnings("Duplicates")
     private Future<Void> deployWebApiVerticle() {
 
@@ -90,16 +89,16 @@ public class StartVerticle extends AbstractVerticle {
         Future<String> deploymentFuture = Future.future();
         deploymentFuture.setHandler(ar -> {
             if (ar.succeeded()) {
-                logger.debug("WebApiVerticle deploy done.");
+                logger.debug("WebVerticle deploy done.");
                 resultFuture.complete();
             } else {
-                logger.debug("WebApiVerticle deploy error: {}", ar.cause().getMessage());
+                logger.debug("WebVerticle deploy error: {}", ar.cause().getMessage());
                 resultFuture.fail(ar.cause());
             }
         });
 
         vertx.deployVerticle(
-            WebApiVerticle.class,
+            WebVerticle.class,
             new DeploymentOptions().setInstances(
                 MainConfig.getInstance().getConfig()
                     .getJsonObject("webApi").getInteger("verticles")),

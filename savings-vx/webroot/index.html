@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <title>jQuery AJAX form submit</title>
+</head>
+<body>
+<div class="container mt-3">
+    <div class="row justify-content">
+        <div class="col-2"></div>
+        <div class="col-4">
+            <h2>Get Account</h2>
+            <form>
+
+                <div class="form-group">
+                    <input type="text" name="name" id="gaUsername" class="form-control" placeholder="User name">
+                </div>
+
+            </form>
+            <button id="getAccountBtn" class="btn btn-primary">Get</button>
+        </div>
+        <div class="col-1"></div>
+        <div class="col-4">
+            <h2>Create Account</h2>
+            <form>
+
+                <div class="form-group">
+                    <input type="text" name="name" id="caUsername" class="form-control" placeholder="User Name">
+                </div>
+                <div class="form-group">
+                    <input type="text" name="email" id="caAccountName" class="form-control" placeholder="Account Name">
+                </div>
+                <div class="form-group">
+                    <input type="text" name="email" id="caAccountDesc" class="form-control"
+                           placeholder="Account Description">
+                </div>
+
+            </form>
+            <button id="createAccountBtn" class="btn btn-primary">Create</button>
+        </div>
+        <div class="col-2"></div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+
+<script>
+    var values;
+    $(document).ready(function () {
+
+        $("#getAccountBtn").click(function () {
+            var owner = $("#gaUsername").val();
+            if (owner.length === 0) {
+                alert("Please provide a user name before asking for details.");
+            } else {
+                $.ajax({
+                    url: "/savings/byowner/" + owner,
+                    success: function (data, textStatus, jQxhr) {
+                        var response = JSON.parse(data);
+                        alert("\n\nUser '" + owner + "' owns a savings account with the following details:\n" + response);
+                    },
+                    error: function (jQxhr, textStatus, errorThrown) {
+                        var errorMessage = jQxhr.status + ': ' + jQxhr.statusText;
+                        if (jQxhr.status === 404) {
+                            alert("\n\nUser '" + owner + "' does not own a savings account.\n\nYou can create one for him.");
+                        } else {
+                            alert("Error: " + errorMessage)
+                        }
+                    }
+                });
+
+            }
+        });
+
+        $("#createAccountBtn").click(function () {
+            var owner = $("#caUsername").val();
+            var accountName = $("#caAccountName").val();
+            var accountDesc = $("#caAccountDesc").val();
+            if (owner.length === 0 || accountName.length === 0 || accountDesc.length === 0) {
+                alert("\n\nPlease fill in all the details for creating a new savings account.\n\n" +
+                    "You provided:\n   user name: '" + owner + "'\n   account name: '" + accountName +
+                    "'\n   account description: '" + accountDesc + "'");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/savings/byowner/" + owner,
+                    dataType: "json",
+                    contentType: 'application/json',
+                    data: JSON.stringify({"name": accountName, "description": accountDesc}),
+                    success: function (data, textStatus, jQxhr) {
+                        var res = JSON.parse(data);
+                        if (jQxhr.status === 201) {
+                            alert("\n\nSavings account create successfully.\n\nDetails: " + res);
+                        }
+                    },
+                    error: function (jQxhr, textStatus, errorThrown) {
+                        var errorMessage = jQuery.parseJSON(jQxhr.responseText).error.message
+                            + "\n\nstatus: " + jQxhr.statusText;
+                        alert("\n\nUnable to create a new savings account.\n\n" + errorMessage)
+                    }
+                });
+
+            }
+        });
+
+    });
+
+</script>
+
+</body>
+</html>

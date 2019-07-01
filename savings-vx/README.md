@@ -1,6 +1,10 @@
 ## Savings - A Vert.x based example
 
 An example of RESTful API implemented using Eclipse Vert.x framework.<br/>
+The business requirements (BRs) are as follows:
+1. The account can only be opened between 8 AM and 5 PM.
+2. The user can have only one savings account.
+
 
 ### Run
 
@@ -11,7 +15,9 @@ To run the application use either:
 
 ### Usage
 
-The following features exposed as API operations can be used:
+There is a basic UI available in /: `http://localhost:8888`.
+
+The following features exposed as API operations that can be called directly:
 
 - get a savings account by owner id
     - example for owner id of 1 (that has a savings account):
@@ -41,10 +47,6 @@ The following features exposed as API operations can be used:
 
     - if BRs are satisfied, it returns the newly created account as Json and HTTP RC 201
     - otherwise, it returns HTTP RC 401 with a friendly error
-
-The BRs are as follows:
-1. The account can only be opened between 8 AM and 5 PM.
-2. The user can have only one savings account.
 
 
 ### Unit Tests
