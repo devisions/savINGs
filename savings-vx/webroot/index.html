@@ -68,8 +68,7 @@
                 $.ajax({
                     url: "/savings/byowner/" + owner,
                     success: function (data, textStatus, jQxhr) {
-                        var response = JSON.parse(data);
-                        alert("\n\nUser '" + owner + "' owns a savings account with the following details:\n" + response);
+                        alert("\n\nUser '" + owner + "' has a savings account. Details:\n" + jQxhr.responseText);
                     },
                     error: function (jQxhr, textStatus, errorThrown) {
                         var errorMessage = jQxhr.status + ': ' + jQxhr.statusText;
@@ -102,12 +101,11 @@
                     success: function (data, textStatus, jQxhr) {
                         var res = JSON.parse(data);
                         if (jQxhr.status === 201) {
-                            alert("\n\nSavings account create successfully.\n\nDetails: " + res);
+                            alert("\n\nSavings account created successfully.");
                         }
                     },
                     error: function (jQxhr, textStatus, errorThrown) {
-                        var errorMessage = jQuery.parseJSON(jQxhr.responseText).error.message
-                            + "\n\nstatus: " + jQxhr.statusText;
+                        var errorMessage = jQuery.parseJSON(jQxhr.responseText).error.message;
                         alert("\n\nUnable to create a new savings account.\n\n" + errorMessage)
                     }
                 });
