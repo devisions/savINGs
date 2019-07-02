@@ -99,7 +99,6 @@
                     contentType: 'application/json',
                     data: JSON.stringify({"name": accountName, "description": accountDesc}),
                     success: function (data, textStatus, jQxhr) {
-                        var res = JSON.parse(data);
                         if (jQxhr.status === 201) {
                             alert("\n\nSavings account created successfully. Details:\n" + jQxhr.responseText);
                         }
