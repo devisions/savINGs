@@ -1,0 +1,33 @@
+@startuml
+
+scale 800 width
+
+title
+
+   Startup phase: actions performed by the StartVerticle
+
+endtitle
+
+
+:Run Script: as r
+(StartVerticle) as sv
+(MainConfig) as mc
+(SavingsAccountsServiceVerticle) as sasv
+(SavingsAccountsService) as sas
+(WebVerticle) as wv
+
+note as sasv_actions
+  1. Uses the service's factory method.
+  2. Registers to event bus the service's implementation.
+end note
+
+r --> sv: run
+sv -> mc: init
+sv --> sasv: deploy
+sv --> wv: deploy X instances
+sasv --> sas: init
+sasv -left-> sasv_actions
+
+wv --> sas: create proxy
+
+@enduml

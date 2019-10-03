@@ -30,8 +30,8 @@ There is a basic UI available at `http://localhost:8888`.
 
 The following capabilities are exposed as API operations:
 
-- get a savings account by owner id
-    - example for owner id of 1 (that has a savings account):
+- Get a savings account by owner id
+    - Example for owner id of 1 (that has a savings account):
       ```bash
       $ curl -v http://localhost:8888/savings/byowner/1
       {
@@ -42,11 +42,11 @@ The following capabilities are exposed as API operations:
       }
       $
       ```
-    - if found, it returns the account as Json and HTTP RC 200
-    - otherwise, it returns HTTP RC 404 with an empty body
+    - If found, it returns the account data as JSON with HTTP RC 200.
+    - Otherwise, it returns HTTP RC 404 with an empty body.
     
-- store a savings account by owner id
-    - example for owner id of 1:
+- Store a savings account by owner id
+    - Example for owner with id 1:
       ```bash
       $ curl -H 'content-type: application/json' -d '{"name":"My Account","description":"Holiday savings bucket"}' http://localhost:8888/savings/byowner/1
       {

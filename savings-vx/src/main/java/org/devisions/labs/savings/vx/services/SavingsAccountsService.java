@@ -40,7 +40,7 @@ public interface SavingsAccountsService {
 
     }
 
-    // __________ features methods __________
+    // __________ feature methods __________
 
     void commCheck(Handler<AsyncResult<JsonObject>> resultHandler);
 

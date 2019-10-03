@@ -32,8 +32,7 @@ public class WebVerticle extends AbstractVerticle implements BaseWebApi {
     @Override
     public void start(Future<Void> startFuture) {
 
-        String savingsAccountsServiceAddress = config.getJsonObject("eventbus")
-            .getString(SavingsAccountsService.Config.EB_ADDRESS);
+        String savingsAccountsServiceAddress = config.getJsonObject("eventbus").getString(SavingsAccountsService.Config.EB_ADDRESS);
         this.savingsAccountsService = SavingsAccountsService.createProxy(vertx, savingsAccountsServiceAddress);
 
         Future<Void> startupSteps = startupCommCheck()
@@ -43,7 +42,9 @@ public class WebVerticle extends AbstractVerticle implements BaseWebApi {
 
     }
 
-    /** Communication checks, performed at startup (verticle deployment) time. */
+    /**
+     * Communication checks, performed at startup (verticle deployment) time.
+     */
     private Future<Void> startupCommCheck() {
 
         Future<Void> responseFuture = Future.future();
@@ -61,7 +62,9 @@ public class WebVerticle extends AbstractVerticle implements BaseWebApi {
 
     }
 
-    /** HTTP (Web API+Pages) setup (routes & http server). */
+    /**
+     * HTTP (Web API+Pages) setup (routes & http server).
+     */
     private Future<Void> httpSetup() {
 
         Future<Void> responseFuture = Future.future();
@@ -97,7 +100,9 @@ public class WebVerticle extends AbstractVerticle implements BaseWebApi {
 
     }
 
-    /** The handler of "getSavingsAccountByOwner" requests. */
+    /**
+     * The handler of "getSavingsAccountByOwner" requests.
+     */
     private void getSavingsAccountByOwnerHandler(RoutingContext context) {
 
         HttpServerRequest request = context.request();
@@ -116,7 +121,9 @@ public class WebVerticle extends AbstractVerticle implements BaseWebApi {
 
     }
 
-    /** The handler of "storeSavingsAccountByOwner" requests. */
+    /**
+     * The handler of "storeSavingsAccountByOwner" requests.
+     */
     private void storeSavingsAccountByOwnerHandler(RoutingContext context) {
 
         HttpServerRequest request = context.request();

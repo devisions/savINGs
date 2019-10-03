@@ -68,7 +68,7 @@
                 $.ajax({
                     url: "/savings/byowner/" + owner,
                     success: function (data, textStatus, jQxhr) {
-                        alert("\n\nUser '" + owner + "' has a savings account. Details:\n" + jQxhr.responseText);
+                        alert("\n\nUser '" + owner + "' has the following savings account:\n" + jQxhr.responseText);
                     },
                     error: function (jQxhr, textStatus, errorThrown) {
                         var errorMessage = jQxhr.status + ': ' + jQxhr.statusText;
