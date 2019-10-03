@@ -4,7 +4,7 @@ scale 800 width
 
 title
 
-   Startup phase: actions performed by the StartVerticle
+   Startup time: actions triggered by the StartVerticle
 
 endtitle
 
@@ -15,19 +15,45 @@ endtitle
 (SavingsAccountsServiceVerticle) as sasv
 (SavingsAccountsService) as sas
 (WebVerticle) as wv
+(Router) as rtr
+(HttpServer) as hs
+
+note as mc_actions
+  It loads the config file
+  into its own memory store.
+  Any component can use it.
+end note
 
 note as sasv_actions
   1. Uses the service's factory method.
-  2. Registers to event bus the service's implementation.
+
+  2. Registers to event bus the newly
+      created service's implementation.
+end note
+
+note as wv_actions
+  1. Gets a service proxy
+      used later for processing requests.
+
+  2. Instantiates a Router
+      and sets API and static routes.
+
+  3. Instantiates the HttpServer
+      and passes the router to it.
 end note
 
 r --> sv: run
 sv -> mc: init
+mc -right-> mc_actions
 sv --> sasv: deploy
 sv --> wv: deploy X instances
 sasv --> sas: init
 sasv -left-> sasv_actions
 
-wv --> sas: create proxy
+wv --> sas: get proxy
+wv --> rtr:  init
+wv --> hs: init
+
+wv -right-> wv_actions
 
 @enduml
