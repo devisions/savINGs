@@ -1,0 +1,32 @@
+@startuml
+
+scale 900 width
+
+!include ./z_skinparams.iuml
+
+title
+
+Request Processing
+
+end title
+
+
+participant "UI" as ui
+participant "HttpServer" as hs
+participant "WebVerticle" as wv
+participant SavingsAccountsService as sas
+participant SavingsAccountsRepo as repo
+
+
+ui -> hs: GET /savings/byowner/{name}
+hr -> wv: route the request to handler\ncall getSavingsAccountByOwnerHandler (routingCtx)
+wv -> sas: call getSavingsAccountByOwner (ownerId, resultHandler)\nwith a callback (handler) to respond back
+
+sas -> sas: validate usage
+sas -> repo: getAccountByOwner(ownerId)
+repo -> sas: return found account or null
+sas --> wv: pass on to the result to the handler
+wv --> hs: respond with JSON\n(done by handler)
+hs --> ui: forward response
+
+@enduml

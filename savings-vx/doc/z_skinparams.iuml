@@ -1,0 +1,26 @@
+
+skinparam {
+  dpi 300
+  RoundCorner 6
+  Shadowing false
+  TitleFontName Open Sans Regular
+  TitleFontColor #555555
+}
+
+skinparam sequence {
+  arrowThickness 0.5
+  arrowColor 84BD00
+  arrowFontColor black
+  arrowFontName Open Sans Regular
+  arrowFontSize 12
+  LifeLineBorderColor #dddddd
+  LifeLineBorderThickness 0.8
+  ParticipantBackgroundColor White
+  ParticipantBorderColor #84BD00
+  ParticipantBorderThickness 0.9
+  ParticipantFontColor #0c74d3
+  ParticipantFontName Open Sans Regular
+  ParticipantFontSize 12
+  TitleFontName Open Sans Light
+  TitleFontColor #555555
+}

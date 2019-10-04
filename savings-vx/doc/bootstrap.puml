@@ -2,6 +2,8 @@
 
 scale 800 width
 
+!include ./z_skinparams.iuml
+
 title
 
    Startup time: actions triggered by the StartVerticle
