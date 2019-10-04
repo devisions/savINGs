@@ -58,12 +58,10 @@ public class MainConfig {
 
         ConfigStoreOptions configStoreOptions = new ConfigStoreOptions();
         if (configFilePath != null) {
-            configStoreOptions.setType("file")
-                .setConfig(new JsonObject().put("path", configFilePath));
+            configStoreOptions.setType("file").setConfig(new JsonObject().put("path", configFilePath));
         }
 
-        ConfigRetriever retriever = ConfigRetriever.create(vertx,
-            new ConfigRetrieverOptions().addStore(configStoreOptions));
+        ConfigRetriever retriever = ConfigRetriever.create(vertx, new ConfigRetrieverOptions().addStore(configStoreOptions));
 
         retriever.getConfig(ar -> {
             if (ar.failed()) {
@@ -118,7 +116,7 @@ public class MainConfig {
 
     /**
      * Use it to enable 'testing mode'. It should be called before <code>init(configFilePath)</code><br/>
-     * as it sets - as part of the MainConfig bootstrap - a fixed clock used for time-sensitive unit tests.
+     * as it sets - as part of the MainConfig bootstrap - a fixed clock used within the time-sensitive unit tests.
      */
     public void enableTestingMode() {
         if (runningMode == 0) {
