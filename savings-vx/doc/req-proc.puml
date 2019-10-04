@@ -6,7 +6,8 @@ scale 900 width
 
 title
 
-Request Processing
+Request Processing Flow
+
 
 end title
 
@@ -19,7 +20,13 @@ participant SavingsAccountsRepo as repo
 
 
 ui -> hs: GET /savings/byowner/{name}
-hr -> wv: route the request to handler\ncall getSavingsAccountByOwnerHandler (routingCtx)
+hs -> wv: route the request to handler\ncall getSavingsAccountByOwnerHandler (routingCtx)
+
+note over wv
+WebVerticle uses the proxy to talk with SavingsAccountsService.
+This proxy hides all the event bus comm specific details.
+end note
+
 wv -> sas: call getSavingsAccountByOwner (ownerId, resultHandler)\nwith a callback (handler) to respond back
 
 sas -> sas: validate usage

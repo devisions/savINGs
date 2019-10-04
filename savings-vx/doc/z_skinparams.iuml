@@ -7,6 +7,14 @@ skinparam {
   TitleFontColor #555555
 }
 
+skinparam note {
+  FontName Open Sans
+  FontSize 12
+  FontColor DimGrey
+  BorderColor LightGrey
+  BackgroundColor white
+}
+
 skinparam sequence {
   arrowThickness 0.5
   arrowColor 84BD00
