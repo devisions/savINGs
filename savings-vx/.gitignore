@@ -1,6 +1,9 @@
 ### Vert.x ###
 .vertx/
 
+src/main/asciidoc
+src/main/generated
+
 ### Eclipse ###
 
 .metadata
