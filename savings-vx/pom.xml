@@ -25,7 +25,7 @@
         <junit-jupiter.version>5.5.2</junit-jupiter.version>
         <assertj-core.version>3.13.2</assertj-core.version>
 
-        <logback-classic.version>1.2.3</logback-classic.version>
+        <logback-classic.version>1.2.13</logback-classic.version>
 
         <main.verticle>org.devisions.labs.savings.vx.StartVerticle</main.verticle>
 
